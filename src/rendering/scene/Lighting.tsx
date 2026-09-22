@@ -5,10 +5,10 @@
 export function Lighting() {
   return (
     <>
-      <hemisphereLight args={["#e8f0ff", "#4a5a4d", 0.6]} />
+      <hemisphereLight args={["#e8f0ff", "#4a5a4d", 0.4]} />
       <directionalLight
         position={[15, 22, 10]}
-        intensity={2.2}
+        intensity={1.8}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}

@@ -1,6 +1,7 @@
 import { Ground } from "./Ground";
 import { EditorGrid } from "./EditorGrid";
 import { Lighting } from "./Lighting";
+import { SceneAtmosphere } from "./SceneAtmosphere";
 import { EditorHelpers } from "./EditorHelpers";
 import { WallsLayer } from "./WallsLayer";
 import { FloorsLayer } from "./FloorsLayer";
@@ -14,6 +15,7 @@ import { PathsLayer } from "./PathsLayer";
 export function Scene() {
   return (
     <>
+      <SceneAtmosphere />
       <Lighting />
       <Ground />
       <EditorGrid />
