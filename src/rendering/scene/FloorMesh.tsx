@@ -1,12 +1,14 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import { useProjectStore } from "@/application/store/useProjectStore";
-import { getMaterialById } from "@/rendering/materials/catalog";
+import { getTextureSet } from "@/rendering/materials/textureSets";
+import { useSurfaceTextures } from "@/rendering/materials/useSurfaceTextures";
 import type { Floor } from "@/types/project";
 
 /**
  * Пол хранится как многоугольник (SPEC.md, раздел 6.4), но в MVP редактор
  * создаёт только прямоугольные полы — поэтому геометрия строится по
  * ограничивающему прямоугольнику вершин, без универсальной триангуляции.
+ * Реальные PBR-текстуры — Poly Haven, CC0 (public/textures/CREDITS.md).
  */
 export function FloorMesh({ floor }: { floor: Floor }) {
   const elevation = useProjectStore(
@@ -15,7 +17,6 @@ export function FloorMesh({ floor }: { floor: Floor }) {
   const selectedRef = useProjectStore((s) => s.selectedEntityRef);
   const setSelectedEntity = useProjectStore((s) => s.setSelectedEntity);
   const activeTool = useProjectStore((s) => s.activeTool);
-  const material = getMaterialById(floor.materialId);
 
   const xs = floor.polygon.map((p) => p.x);
   const zs = floor.polygon.map((p) => p.z);
@@ -26,6 +27,12 @@ export function FloorMesh({ floor }: { floor: Floor }) {
   const width = maxX - minX;
   const depth = maxZ - minZ;
   const isSelected = selectedRef?.kind === "floor" && selectedRef.id === floor.id;
+
+  const textures = useSurfaceTextures(
+    getTextureSet(floor.materialId),
+    Math.max(1, width),
+    Math.max(1, depth),
+  );
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
@@ -42,9 +49,11 @@ export function FloorMesh({ floor }: { floor: Floor }) {
     >
       <boxGeometry args={[width, floor.thickness, depth]} />
       <meshStandardMaterial
-        color={material.baseColor}
-        roughness={material.roughness}
-        metalness={material.metalness}
+        map={textures.map}
+        normalMap={textures.normalMap}
+        roughnessMap={textures.roughnessMap}
+        roughness={1}
+        metalness={0}
         emissive={isSelected ? "#2bbba8" : "#000000"}
         emissiveIntensity={isSelected ? 0.35 : 0}
       />

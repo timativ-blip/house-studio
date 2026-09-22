@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Ground } from "./Ground";
 import { EditorGrid } from "./EditorGrid";
 import { Lighting } from "./Lighting";
@@ -7,6 +8,7 @@ import { WallsLayer } from "./WallsLayer";
 import { FloorsLayer } from "./FloorsLayer";
 import { ItemsLayer } from "./ItemsLayer";
 import { PathsLayer } from "./PathsLayer";
+import { PostFX } from "./PostFX";
 
 /**
  * Корень 3D-сцены. Преобразует состояние проекта в декларативную сцену
@@ -17,13 +19,16 @@ export function Scene() {
     <>
       <SceneAtmosphere />
       <Lighting />
-      <Ground />
+      <Suspense fallback={null}>
+        <Ground />
+      </Suspense>
       <EditorGrid />
       <FloorsLayer />
       <WallsLayer />
       <PathsLayer />
       <ItemsLayer />
       <EditorHelpers />
+      <PostFX />
     </>
   );
 }

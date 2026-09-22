@@ -16,7 +16,7 @@ export function App() {
       <div className="app-body">
         <Toolbar />
         <div className="viewport-column">
-          <Canvas className="viewport" shadows>
+          <Canvas className="viewport" shadows="soft" gl={{ antialias: true }}>
             <CameraRig />
             <Scene />
           </Canvas>

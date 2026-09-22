@@ -1,14 +1,17 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import { useProjectStore } from "@/application/store/useProjectStore";
 import { wallGeometryParams } from "@/domain/walls/wallGeometry";
-import { getMaterialById, type MaterialDefinition } from "@/rendering/materials/catalog";
+import { getTextureSet } from "@/rendering/materials/textureSets";
+import { useSurfaceTextures, type SurfaceTextures } from "@/rendering/materials/useSurfaceTextures";
 import type { Wall } from "@/types/project";
 
-function faceMaterialProps(material: MaterialDefinition, selected: boolean) {
+function faceMaterialProps(textures: SurfaceTextures, selected: boolean) {
   return {
-    color: material.baseColor,
-    roughness: material.roughness,
-    metalness: material.metalness,
+    map: textures.map,
+    normalMap: textures.normalMap,
+    roughnessMap: textures.roughnessMap,
+    roughness: 1,
+    metalness: 0,
     emissive: selected ? "#2bbba8" : "#000000",
     emissiveIntensity: selected ? 0.35 : 0,
   } as const;
@@ -19,7 +22,8 @@ function faceMaterialProps(material: MaterialDefinition, selected: boolean) {
  * wallGeometryParams (SPEC.md, раздел 7.2). Материалы назначены по группам
  * граней BoxGeometry: +z/-z — большие грани (экстерьер/интерьер, раздел
  * 6.2), торцы и верх/низ переиспользуют материал экстерьера, пока не
- * появятся соединения стен (раздел 7.2, «Соединение стен»).
+ * появятся соединения стен (раздел 7.2, «Соединение стен»). Реальные
+ * PBR-текстуры — Poly Haven, CC0 (public/textures/CREDITS.md).
  */
 export function WallMesh({ wall }: { wall: Wall }) {
   const elevation = useProjectStore(
@@ -30,9 +34,20 @@ export function WallMesh({ wall }: { wall: Wall }) {
   const activeTool = useProjectStore((s) => s.activeTool);
 
   const { length, angle, center } = wallGeometryParams(wall.start, wall.end);
-  const exterior = getMaterialById(wall.materialId.exterior);
-  const interior = getMaterialById(wall.materialId.interior);
   const isSelected = selectedRef?.kind === "wall" && selectedRef.id === wall.id;
+
+  const repeatX = Math.max(1, length);
+  const repeatY = Math.max(1, wall.height);
+  const exteriorTextures = useSurfaceTextures(
+    getTextureSet(wall.materialId.exterior),
+    repeatX,
+    repeatY,
+  );
+  const interiorTextures = useSurfaceTextures(
+    getTextureSet(wall.materialId.interior),
+    repeatX,
+    repeatY,
+  );
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
@@ -54,11 +69,17 @@ export function WallMesh({ wall }: { wall: Wall }) {
         <meshStandardMaterial
           key={i}
           attach={`material-${i}`}
-          {...faceMaterialProps(exterior, isSelected)}
+          {...faceMaterialProps(exteriorTextures, isSelected)}
         />
       ))}
-      <meshStandardMaterial attach="material-4" {...faceMaterialProps(exterior, isSelected)} />
-      <meshStandardMaterial attach="material-5" {...faceMaterialProps(interior, isSelected)} />
+      <meshStandardMaterial
+        attach="material-4"
+        {...faceMaterialProps(exteriorTextures, isSelected)}
+      />
+      <meshStandardMaterial
+        attach="material-5"
+        {...faceMaterialProps(interiorTextures, isSelected)}
+      />
     </mesh>
   );
 }
