@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  background: #1b1f1e;
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.app-root canvas {
+  display: block;
+}
+
+.viewport {
+  flex: 1;
+  min-height: 0;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 16px;
+  background: #2a2f2e;
+  color: #e7ece9;
+  border-bottom: 1px solid #3a403e;
+  flex-shrink: 0;
+}
+
+.top-bar__title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.top-bar__project {
+  color: #9fb0aa;
+  font-size: 0.9rem;
+}
