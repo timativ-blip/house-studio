@@ -8,7 +8,7 @@
 export interface MaterialDefinition {
   id: string;
   name: string;
-  category: "wall" | "floor";
+  category: "wall" | "floor" | "path";
   baseColor: string;
   roughness: number;
   metalness: number;
@@ -63,6 +63,22 @@ export const MATERIALS: readonly MaterialDefinition[] = [
     roughness: 0.85,
     metalness: 0,
   },
+  {
+    id: "path-gravel",
+    name: "Гравий",
+    category: "path",
+    baseColor: "#b3ac9e",
+    roughness: 1,
+    metalness: 0,
+  },
+  {
+    id: "path-pavers",
+    name: "Тротуарная плитка",
+    category: "path",
+    baseColor: "#8b8680",
+    roughness: 0.7,
+    metalness: 0,
+  },
 ] as const;
 
 const MATERIALS_BY_ID = new Map(MATERIALS.map((m) => [m.id, m]));
@@ -83,3 +99,4 @@ export function getMaterialsByCategory(
 
 export const DEFAULT_WALL_MATERIAL_ID = "wall-plaster-white";
 export const DEFAULT_FLOOR_MATERIAL_ID = "floor-wood-oak";
+export const DEFAULT_PATH_MATERIAL_ID = "path-gravel";

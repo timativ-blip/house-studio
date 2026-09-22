@@ -27,6 +27,8 @@ export function createDefaultProject(): Project {
     entities: {
       walls: {},
       floors: {},
+      items: {},
+      paths: {},
     },
   };
 }

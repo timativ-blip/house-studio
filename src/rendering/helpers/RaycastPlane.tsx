@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
 import { useProjectStore } from "@/application/store/useProjectStore";
-import { resolveSnapPoint } from "@/domain/geometry/snapping";
+import { resolveSnapPoint, snapToGrid } from "@/domain/geometry/snapping";
 import type { Vec2 } from "@/domain/geometry/vec2";
 import { WORLD_CONFIG } from "@/config/world";
 
@@ -10,11 +10,16 @@ import { WORLD_CONFIG } from "@/config/world";
  * курсора для инструментов строительства (SPEC.md, раздел 13.1: «луч должен
  * пересекать математическую плоскость текущего уровня»). Привязка сначала
  * пытается зацепиться за концы существующих стен, затем — за сетку
- * (раздел 5.2). Часть EditorHelpers — не строительная сущность.
+ * (раздел 5.2). Также обновляет предпросмотр перетаскиваемого объекта и
+ * фиксирует перемещение по отпусканию кнопки (раздел 10.3). Часть
+ * EditorHelpers — не строительная сущность.
  */
 export function RaycastPlane() {
   const setCursorPoint = useProjectStore((s) => s.setCursorPoint);
   const handlePlaneClick = useProjectStore((s) => s.handlePlaneClick);
+  const draggingItemId = useProjectStore((s) => s.draggingItemId);
+  const updateDragPreview = useProjectStore((s) => s.updateDragPreview);
+  const commitDrag = useProjectStore((s) => s.commitDrag);
   const elevation = useProjectStore(
     (s) => s.project.levels[s.activeLevelId]?.elevation ?? 0,
   );
@@ -29,31 +34,39 @@ export function RaycastPlane() {
     return points;
   }, [walls]);
 
+  const snapPoint = (raw: Vec2): Vec2 => {
+    if (draggingItemId) {
+      // Перетаскиваемый предмет цепляется только за сетку — за концы стен
+      // цепляются только сами стены (иначе мебель "прилипала" бы к углам).
+      return snapToGrid(raw, WORLD_CONFIG.gridStep);
+    }
+    return resolveSnapPoint(raw, {
+      gridStep: WORLD_CONFIG.gridStep,
+      snapTolerance: WORLD_CONFIG.snapTolerance,
+      existingPoints,
+    });
+  };
+
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
-    const snapped = resolveSnapPoint(
-      { x: event.point.x, z: event.point.z },
-      {
-        gridStep: WORLD_CONFIG.gridStep,
-        snapTolerance: WORLD_CONFIG.snapTolerance,
-        existingPoints,
-      },
-    );
+    const snapped = snapPoint({ x: event.point.x, z: event.point.z });
     setCursorPoint(snapped);
+    if (draggingItemId) {
+      updateDragPreview(snapped);
+    }
   };
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     if (event.point) {
-      const snapped = resolveSnapPoint(
-        { x: event.point.x, z: event.point.z },
-        {
-          gridStep: WORLD_CONFIG.gridStep,
-          snapTolerance: WORLD_CONFIG.snapTolerance,
-          existingPoints,
-        },
-      );
-      handlePlaneClick(snapped);
+      handlePlaneClick(snapPoint({ x: event.point.x, z: event.point.z }));
+    }
+  };
+
+  const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
+    if (draggingItemId) {
+      event.stopPropagation();
+      commitDrag();
     }
   };
 
@@ -63,6 +76,7 @@ export function RaycastPlane() {
       rotation={[-Math.PI / 2, 0, 0]}
       onPointerMove={handlePointerMove}
       onPointerLeave={() => setCursorPoint(null)}
+      onPointerUp={handlePointerUp}
       onClick={handleClick}
     >
       <planeGeometry args={[width, depth]} />

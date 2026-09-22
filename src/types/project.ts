@@ -1,6 +1,6 @@
 /**
- * Типы проекта. Полная модель — см. SPEC.md, раздел 6. Проёмы и предметы
- * интерьера (раздел 6.3, 6.5) появятся на Этапах 3 и 5.
+ * Типы проекта. Полная модель — см. SPEC.md, раздел 6. Проёмы (раздел 6.3)
+ * появятся на Этапе 5.
  */
 import type { Vec2 } from "@/domain/geometry/vec2";
 
@@ -51,6 +51,30 @@ export interface Floor extends LevelReference {
   thickness: number;
 }
 
+/** Мебель, декор и растения — единая механика размещения, раздел 6.5, 10. */
+export interface PlacedItem extends LevelReference {
+  id: EntityId;
+  assetId: string;
+  position: { x: number; y: number; z: number };
+  rotationY: number;
+  scale?: number;
+  materialVariantId?: string;
+}
+
+/** База для объектов территории, раздел 11.2. Сейчас используется только "path". */
+export interface LandscapeEntity extends LevelReference {
+  id: EntityId;
+  kind: "path" | "fence" | "plant" | "decor";
+}
+
+/** Прямая дорожка (MVP — один сегмент), раздел 11.2. */
+export interface Path extends LandscapeEntity {
+  kind: "path";
+  segments: [Vec2, Vec2];
+  width: number;
+  materialId: string;
+}
+
 export interface Project {
   meta: ProjectMeta;
   siteSize: { width: number; depth: number };
@@ -58,5 +82,7 @@ export interface Project {
   entities: {
     walls: Record<EntityId, Wall>;
     floors: Record<EntityId, Floor>;
+    items: Record<EntityId, PlacedItem>;
+    paths: Record<EntityId, Path>;
   };
 }

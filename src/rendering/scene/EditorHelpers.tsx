@@ -2,6 +2,8 @@ import { RaycastPlane } from "@/rendering/helpers/RaycastPlane";
 import { SnapCursor } from "@/rendering/helpers/SnapCursor";
 import { WallPreview } from "@/rendering/helpers/WallPreview";
 import { RoomPreview } from "@/rendering/helpers/RoomPreview";
+import { PlacementGhost } from "@/rendering/helpers/PlacementGhost";
+import { PathPreview } from "@/rendering/helpers/PathPreview";
 
 /**
  * Вспомогательные элементы редактора: не сохраняются в проект.
@@ -14,6 +16,8 @@ export function EditorHelpers() {
       <SnapCursor />
       <WallPreview />
       <RoomPreview />
+      <PlacementGhost />
+      <PathPreview />
     </>
   );
 }

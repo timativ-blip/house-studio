@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 import { useProjectStore } from "@/application/store/useProjectStore";
 
+const ROTATE_STEP_RAD = (15 * Math.PI) / 180;
+
 /**
- * Глобальные горячие клавиши редактора (SPEC.md, раздел 13.1 и 15.2):
+ * Глобальные горячие клавиши редактора (SPEC.md, раздел 13.1, 15.2, 10.3):
  * Esc — отмена черновика инструмента, Delete/Backspace — удалить
- * выделенное, Ctrl/Cmd+Z — отменить, Ctrl/Cmd+Shift+Z — повторить.
+ * выделенное, Ctrl/Cmd+Z — отменить, Ctrl/Cmd+Shift+Z — повторить,
+ * Q/E — повернуть выделенный предмет.
  */
 export function useEditorShortcuts() {
   useEffect(() => {
@@ -12,7 +15,8 @@ export function useEditorShortcuts() {
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
 
-      const { cancelDraft, deleteSelected, undo, redo } = useProjectStore.getState();
+      const { cancelDraft, deleteSelected, undo, redo, rotateSelectedItem } =
+        useProjectStore.getState();
 
       if (event.key === "Escape") {
         cancelDraft();
@@ -21,6 +25,16 @@ export function useEditorShortcuts() {
 
       if (event.key === "Delete" || event.key === "Backspace") {
         deleteSelected();
+        return;
+      }
+
+      if (event.key.toLowerCase() === "q") {
+        rotateSelectedItem(-ROTATE_STEP_RAD);
+        return;
+      }
+
+      if (event.key.toLowerCase() === "e") {
+        rotateSelectedItem(ROTATE_STEP_RAD);
         return;
       }
 

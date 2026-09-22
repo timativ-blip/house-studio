@@ -4,6 +4,7 @@ import { CameraRig } from "@/rendering/camera/CameraRig";
 import { TopBar } from "@/presentation/layout/TopBar";
 import { Toolbar } from "@/presentation/toolbar/Toolbar";
 import { InspectorPanel } from "@/presentation/inspector/InspectorPanel";
+import { BottomCatalog } from "@/presentation/catalog/BottomCatalog";
 import { useEditorShortcuts } from "@/application/keyboard/useEditorShortcuts";
 
 export function App() {
@@ -14,10 +15,13 @@ export function App() {
       <TopBar />
       <div className="app-body">
         <Toolbar />
-        <Canvas className="viewport" shadows>
-          <CameraRig />
-          <Scene />
-        </Canvas>
+        <div className="viewport-column">
+          <Canvas className="viewport" shadows>
+            <CameraRig />
+            <Scene />
+          </Canvas>
+          <BottomCatalog />
+        </div>
         <InspectorPanel />
       </div>
     </div>

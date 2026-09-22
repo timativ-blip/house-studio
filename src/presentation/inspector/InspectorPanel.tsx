@@ -1,7 +1,8 @@
 import { useProjectStore } from "@/application/store/useProjectStore";
 import { wallLength } from "@/domain/walls/wallGeometry";
 import { getMaterialsByCategory, type MaterialDefinition } from "@/rendering/materials/catalog";
-import { Trash2 } from "lucide-react";
+import { getCatalogItemById } from "@/rendering/catalog/items";
+import { Trash2, RotateCcw, RotateCw } from "lucide-react";
 
 function MaterialSwatches({
   category,
@@ -108,17 +109,114 @@ function FloorInspector({ floorId }: { floorId: string }) {
   );
 }
 
+const ROTATE_STEP_RAD = (15 * Math.PI) / 180;
+
+function ItemInspector({ itemId }: { itemId: string }) {
+  const item = useProjectStore((s) => s.project.entities.items[itemId]);
+  const deleteSelected = useProjectStore((s) => s.deleteSelected);
+  const rotateSelectedItem = useProjectStore((s) => s.rotateSelectedItem);
+
+  if (!item) return null;
+
+  const catalogItem = getCatalogItemById(item.assetId);
+
+  return (
+    <>
+      <h2 className="inspector__title">{catalogItem.name}</h2>
+      <dl className="inspector__fields">
+        <div className="inspector__field">
+          <dt>Позиция</dt>
+          <dd>
+            X: {item.position.x.toFixed(2)} м, Z: {item.position.z.toFixed(2)} м
+          </dd>
+        </div>
+        <div className="inspector__field">
+          <dt>Поворот</dt>
+          <dd className="inspector__rotate">
+            {Math.round((item.rotationY * 180) / Math.PI)}°
+            <button
+              type="button"
+              className="inspector__rotate-button"
+              title="Повернуть влево (Q)"
+              onClick={() => rotateSelectedItem(-ROTATE_STEP_RAD)}
+            >
+              <RotateCcw size={14} />
+            </button>
+            <button
+              type="button"
+              className="inspector__rotate-button"
+              title="Повернуть вправо (E)"
+              onClick={() => rotateSelectedItem(ROTATE_STEP_RAD)}
+            >
+              <RotateCw size={14} />
+            </button>
+          </dd>
+        </div>
+      </dl>
+      <button type="button" className="inspector__delete" onClick={deleteSelected}>
+        <Trash2 size={16} /> Удалить объект
+      </button>
+    </>
+  );
+}
+
+function PathInspector({ pathId }: { pathId: string }) {
+  const path = useProjectStore((s) => s.project.entities.paths[pathId]);
+  const setPathMaterial = useProjectStore((s) => s.setPathMaterial);
+  const deleteSelected = useProjectStore((s) => s.deleteSelected);
+
+  if (!path) return null;
+
+  const [start, end] = path.segments;
+  const length = Math.hypot(end.x - start.x, end.z - start.z);
+
+  return (
+    <>
+      <h2 className="inspector__title">Дорожка</h2>
+      <dl className="inspector__fields">
+        <div className="inspector__field">
+          <dt>Длина</dt>
+          <dd>{length.toFixed(2)} м</dd>
+        </div>
+        <div className="inspector__field">
+          <dt>Ширина</dt>
+          <dd>{path.width.toFixed(2)} м</dd>
+        </div>
+        <div className="inspector__field">
+          <dt>Материал</dt>
+          <MaterialSwatches
+            category="path"
+            activeId={path.materialId}
+            onPick={(id) => setPathMaterial(path.id, id)}
+          />
+        </div>
+      </dl>
+      <button type="button" className="inspector__delete" onClick={deleteSelected}>
+        <Trash2 size={16} /> Удалить дорожку
+      </button>
+    </>
+  );
+}
+
 function SiteInspector() {
   const siteSize = useProjectStore((s) => s.project.siteSize);
   const cursorPoint = useProjectStore((s) => s.cursorPoint);
   const activeTool = useProjectStore((s) => s.activeTool);
+
+  const landscapeMode = useProjectStore((s) => s.landscapeMode);
 
   const hint =
     activeTool === "wall"
       ? "Клик — начать стену, клик ещё раз — завершить. Esc — отмена."
       : activeTool === "room"
         ? "Клик — первый угол комнаты, клик ещё раз — противоположный угол. Esc — отмена."
-        : "Выберите стену или пол на сцене, чтобы увидеть их свойства.";
+        : activeTool === "furniture"
+          ? "Выберите предмет внизу и кликните на сцене, чтобы разместить его."
+          : activeTool === "landscape"
+            ? landscapeMode === "path"
+              ? "Клик — начало дорожки, клик ещё раз — конец. Esc — отмена."
+              : "Выберите объект внизу и кликните на сцене, чтобы разместить его."
+            : "Выберите объект на сцене, чтобы увидеть его свойства.";
 
   return (
     <>
@@ -152,6 +250,8 @@ export function InspectorPanel() {
     <aside className="inspector">
       {selectedEntityRef?.kind === "wall" && <WallInspector wallId={selectedEntityRef.id} />}
       {selectedEntityRef?.kind === "floor" && <FloorInspector floorId={selectedEntityRef.id} />}
+      {selectedEntityRef?.kind === "item" && <ItemInspector itemId={selectedEntityRef.id} />}
+      {selectedEntityRef?.kind === "path" && <PathInspector pathId={selectedEntityRef.id} />}
       {!selectedEntityRef && <SiteInspector />}
     </aside>
   );

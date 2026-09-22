@@ -40,9 +40,73 @@ body {
   min-height: 0;
 }
 
-.viewport {
+.viewport-column {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
+}
+
+.viewport {
+  flex: 1;
+  min-height: 0;
+}
+
+.bottom-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  background: #232726;
+  border-top: 1px solid #3a403e;
+}
+
+.bottom-catalog__modes {
+  display: flex;
+  gap: 8px;
+}
+
+.bottom-catalog__mode {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #3a403e;
+  background: transparent;
+  color: #cdd7d2;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.bottom-catalog__mode[data-active="true"] {
+  border-color: #2bbba8;
+  color: #2bbba8;
+  background: #2bbba81a;
+}
+
+.bottom-catalog__items {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bottom-catalog__item {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #3a403e;
+  background: #2a2f2e;
+  color: #e7ece9;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.bottom-catalog__item:hover {
+  background: #323836;
+}
+
+.bottom-catalog__item[data-active="true"] {
+  border-color: #2bbba8;
+  color: #2bbba8;
+  background: #2bbba81a;
 }
 
 .toolbar {
@@ -158,6 +222,29 @@ body {
 
 .inspector__delete:hover {
   background: #472e2c;
+}
+
+.inspector__rotate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inspector__rotate-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #3a403e;
+  background: #2a2f2e;
+  color: #cdd7d2;
+  cursor: pointer;
+}
+
+.inspector__rotate-button:hover {
+  background: #323836;
 }
 
 .inspector__hint {

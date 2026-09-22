@@ -13,6 +13,8 @@ export const WORLD_CONFIG = {
   defaultWallHeight: 2.8,
   /** Толщина стены по умолчанию, метры. */
   defaultWallThickness: 0.2,
+  /** Ширина дорожки по умолчанию, метры. См. раздел 11.2. */
+  defaultPathWidth: 1.0,
 } as const;
 
 export const CURRENT_PROJECT_FORMAT_VERSION = "0.1.0";
