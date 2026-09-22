@@ -4,8 +4,11 @@ import { CameraRig } from "@/rendering/camera/CameraRig";
 import { TopBar } from "@/presentation/layout/TopBar";
 import { Toolbar } from "@/presentation/toolbar/Toolbar";
 import { InspectorPanel } from "@/presentation/inspector/InspectorPanel";
+import { useEditorShortcuts } from "@/application/keyboard/useEditorShortcuts";
 
 export function App() {
+  useEditorShortcuts();
+
   return (
     <div className="app-root">
       <TopBar />

@@ -24,5 +24,9 @@ export function createDefaultProject(): Project {
         visible: true,
       },
     },
+    entities: {
+      walls: {},
+      floors: {},
+    },
   };
 }

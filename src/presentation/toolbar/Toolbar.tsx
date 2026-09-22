@@ -28,13 +28,13 @@ interface PlannedToolDef {
 
 type ToolDef = ImplementedToolDef | PlannedToolDef;
 
-// Полный список инструментов из SPEC.md, раздел 17.3. Реально работает
-// пока только "Выделение" — остальные появятся на Этапах 2–4 и лишь
-// помечены как недоступные, без вида рабочей кнопки (правило № 4).
+// Полный список инструментов из SPEC.md, раздел 17.3. Реально работают
+// "Выделение", "Стены" и "Комнаты" — остальные появятся на Этапах 3–4 и
+// лишь помечены как недоступные, без вида рабочей кнопки (правило № 4).
 const TOOLS: ToolDef[] = [
   { key: "select", toolId: "select", label: "Выделение", icon: MousePointer2 },
-  { key: "wall", label: "Стены", icon: RectangleHorizontal },
-  { key: "room", label: "Комнаты", icon: Frame },
+  { key: "wall", toolId: "wall", label: "Стены", icon: RectangleHorizontal },
+  { key: "room", toolId: "room", label: "Комнаты", icon: Frame },
   { key: "floor", label: "Полы", icon: LayoutGrid },
   { key: "openings", label: "Двери и окна", icon: DoorOpen },
   { key: "furniture", label: "Мебель", icon: Sofa },
